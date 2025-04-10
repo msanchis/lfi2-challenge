@@ -10,8 +10,8 @@ services:
       - "8082:80"   # Puerto para el servidor web
       - "2222:22"   # Puerto para SSH
     restart: unless-stopped
-    volumes:
-      - ctf_data:/var/www/html/uploads  # Persistencia para los archivos subidos
+      #volumes:
+      #- ctf_data:/var/www/html/uploads  # Persistencia para los archivos subidos
 
-volumes:
-  ctf_data:    # Volumen para mantener los archivos subidos entre reinicios
+        #volumes:
+        #ctf_data:    # Volumen para mantener los archivos subidos entre reinicios
