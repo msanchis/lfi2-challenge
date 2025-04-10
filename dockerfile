@@ -1,10 +1,8 @@
 # Dockerfile para crear un reto de seguridad CTF
 FROM ubuntu:20.04
 
-# Evitar interacciones durante la instalación
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Actualizar e instalar paquetes necesarios
 RUN apt-get update && apt-get install -y \
     apache2 \
     php \
@@ -15,32 +13,41 @@ RUN apt-get update && apt-get install -y \
     curl \
     iputils-ping \
     net-tools \
+    openssh-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Configurar apache y php
 RUN a2enmod php7.4
 
 # Configurar SSH
 RUN mkdir -p /var/run/sshd
 RUN echo 'root:toor' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+RUN sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
 # Crear usuarios
 RUN useradd -m -s /bin/bash user && echo "user:password123" | chpasswd
-RUN useradd -m -s /bin/bash www-data || echo "www-data ya existe"
 
-# Crear archivos objetivo
+# Crear clave SSH para user
+RUN mkdir -p /home/user/.ssh && \
+    ssh-keygen -t rsa -b 2048 -f /home/user/.ssh/id_rsa -N "" && \
+    cat /home/user/.ssh/id_rsa.pub > /home/user/.ssh/authorized_keys && \
+    chown -R user:user /home/user/.ssh && \
+    chmod 700 /home/user/.ssh && \
+    chmod 600 /home/user/.ssh/authorized_keys
+
+# Opcional: Mostrar la clave privada en el build output
+RUN echo "===== PRIVATE KEY =====" && cat /home/user/.ssh/id_rsa
+
 RUN echo "FLAG{c0ngr4ts_y0u_f0und_the_fl4g}" > /home/user/flag.txt
 RUN echo "FLAG{r00t_h4s_b33n_pwn3d}" > /root/root.txt
 RUN chmod 400 /home/user/flag.txt
 RUN chmod 400 /root/root.txt
 
-# Configurar el directorio web con la vulnerabilidad de subida de archivos
 RUN mkdir -p /var/www/html/uploads
 RUN chmod 777 /var/www/html/uploads
 
-# Crear una página de subida de archivos vulnerable
 RUN echo '<?php \n\
 if(isset($_FILES["fileToUpload"])) { \n\
     $target_dir = "uploads/"; \n\
@@ -65,20 +72,16 @@ if(isset($_FILES["fileToUpload"])) { \n\
 </body> \n\
 </html>' > /var/www/html/index.php
 
-# Establecer permisos www-data
 RUN chown -R www-data:www-data /var/www/html/
 
-# Configurar sudoers para la vulnerabilidad de escalada de privilegios
 RUN echo "www-data ALL=(ALL) NOPASSWD: /usr/bin/vim" >> /etc/sudoers
 
-# Crear un script de puerta trasera
 RUN echo '#!/bin/bash \n\
 /bin/bash' > /usr/local/bin/backdoor.sh
 RUN chmod 755 /usr/local/bin/backdoor.sh
 RUN chown www-data:www-data /usr/local/bin/backdoor.sh
 
-# Exponer puertos
 EXPOSE 80 22
 
-# Iniciar servicios
 CMD service apache2 start && service ssh start && tail -f /dev/null
+
