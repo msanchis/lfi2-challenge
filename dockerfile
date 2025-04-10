@@ -37,12 +37,16 @@ RUN mkdir -p /home/user/.ssh && \
     chmod 700 /home/user/.ssh && \
     chmod 600 /home/user/.ssh/authorized_keys
 
+RUN tar -czvf /tmp/backup.tgz /home/user/.ssh/id_rsa
+RUN chown www-data:www-data /tmp/backup.tgz 
+
 # Opcional: Mostrar la clave privada en el build output
 RUN echo "===== PRIVATE KEY =====" && cat /home/user/.ssh/id_rsa
 
 RUN echo "FLAG{c0ngr4ts_y0u_f0und_the_fl4g}" > /home/user/flag.txt
 RUN echo "FLAG{r00t_h4s_b33n_pwn3d}" > /root/root.txt
 RUN chmod 400 /home/user/flag.txt
+RUN chown user:user /home/user/flag.txt
 RUN chmod 400 /root/root.txt
 
 RUN mkdir -p /var/www/html/uploads
@@ -62,7 +66,7 @@ if(isset($_FILES["fileToUpload"])) { \n\
 <!DOCTYPE html> \n\
 <html> \n\
 <body> \n\
-<h2>Subir Archivo</h2> \n\
+<h2>Subir Archivo para demostrar en el Curso ABR que esto funciona :-D</h2> \n\
 <form action="" method="post" enctype="multipart/form-data"> \n\
     Selecciona un archivo: \n\
     <input type="file" name="fileToUpload" id="fileToUpload"> \n\
@@ -74,7 +78,7 @@ if(isset($_FILES["fileToUpload"])) { \n\
 
 RUN chown -R www-data:www-data /var/www/html/
 
-RUN echo "www-data ALL=(ALL) NOPASSWD: /usr/bin/vim" >> /etc/sudoers
+RUN echo "user ALL=(ALL) NOPASSWD: /usr/bin/vim" >> /etc/sudoers
 
 RUN echo '#!/bin/bash \n\
 /bin/bash' > /usr/local/bin/backdoor.sh
