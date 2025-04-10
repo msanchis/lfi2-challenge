@@ -7,7 +7,8 @@ Este proyecto crea un entorno Docker para practicar técnicas de ciberseguridad,
 El entorno contiene:
 - Un servidor web Apache con PHP
 - Una página web vulnerable que permite subir archivos sin restricciones
-- Un usuario `www-data` con permisos de sudo mal configurados
+- Un usuario `user` con id_rsa para conectarse al ssh
+- Un usuario `user` con permisos de sudo mal configurados
 - Dos archivos objetivo: `/home/user/flag.txt` y `/root/root.txt`
 
 ## Puesta en marcha

